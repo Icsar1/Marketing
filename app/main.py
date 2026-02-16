@@ -19,7 +19,7 @@ analyzer = SeoAnalyzer()
 scheduler = BackgroundScheduler()
 
 
-class TildaLeadPayload(BaseModel):
+class LeadPayload(BaseModel):
     name: str
     phone: str
     email: str
@@ -49,8 +49,8 @@ def health() -> dict:
     return {"status": "ok", "provider": settings.seo_data_provider}
 
 
-@app.post("/webhooks/tilda/seo")
-async def tilda_webhook(payload: TildaLeadPayload):
+@app.post("/lead/seo")
+async def create_seo_report(payload: LeadPayload):
     lead = SeoLead(
         name=payload.name,
         phone=payload.phone,
