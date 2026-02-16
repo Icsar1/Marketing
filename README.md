@@ -120,6 +120,39 @@ git pull origin work
 - `POST /lead/seo` — создать SEO-отчет.
 - `GET /r/{report_id}` — страница отчета.
 
+## Если при запуске ошибка `TypeError: 'type' object is not subscriptable`
+
+Это значит, что на VPS крутится **старая версия файлов** с аннотациями `list[str]` (Python 3.8 так не умеет).
+
+Сделай по шагам:
+
+```bash
+cd /opt/seo-analyzer
+git fetch --all
+git checkout work
+git pull origin work
+python -m compileall app
+```
+
+Проверь, что в файлах больше нет `list[`:
+
+```bash
+grep -nF "list[" app/models.py app/providers.py
+```
+
+Если команда ничего не вывела — всё ок, запускай:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Если `list[` всё ещё есть, принудительно обнови 2 файла из git:
+
+```bash
+git checkout -- app/models.py app/providers.py
+python -m compileall app
+```
+
 ## Если в консоли VPS ошибка `Invalid regular expression`
 
 На некоторых VPS (busybox/урезанный grep) команда с экранированием может падать:
