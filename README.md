@@ -153,6 +153,26 @@ git checkout -- app/models.py app/providers.py
 python -m compileall app
 ```
 
+
+### Экстренный фикс прямо на VPS (если `git pull` не помог)
+
+Выполни команды ниже по одной строке в папке проекта:
+
+```bash
+cd /opt/seo-analyzer
+sed -i 's/list\[str\]/List[str]/g; s/list\[dict\]/List[Dict[str, str]]/g' app/models.py app/providers.py
+grep -q "from typing import Dict, List" app/models.py || sed -i '1i from typing import Dict, List' app/models.py
+grep -q "from typing import Dict, List" app/providers.py || sed -i '1i from typing import Dict, List' app/providers.py
+python -m compileall app
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Проверка (должно быть пусто):
+
+```bash
+grep -nF "list[" app/models.py app/providers.py
+```
+
 ## Если в консоли VPS ошибка `Invalid regular expression`
 
 На некоторых VPS (busybox/урезанный grep) команда с экранированием может падать:
