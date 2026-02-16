@@ -46,7 +46,7 @@ def shutdown() -> None:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "provider": settings.seo_data_provider}
 
 
 @app.post("/webhooks/tilda/seo")

@@ -12,6 +12,7 @@ class Settings(BaseModel):
     yandex_webmaster_token: str = os.getenv("YANDEX_WEBMASTER_TOKEN", "")
     yandex_direct_token: str = os.getenv("YANDEX_DIRECT_TOKEN", "")
     yandex_metrica_token: str = os.getenv("YANDEX_METRICA_TOKEN", "")
+    seo_data_provider: str = os.getenv("SEO_DATA_PROVIDER", "mock")
 
 
 settings = Settings()

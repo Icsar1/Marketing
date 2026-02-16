@@ -1,48 +1,28 @@
 from datetime import datetime, timedelta, timezone
-from hashlib import md5
 import uuid
 
 from app.config import settings
 from app.models import SeoLead, SeoReport
+from app.providers import build_provider
 
 
 class SeoAnalyzer:
     """
-    Lightweight SEO analyzer skeleton:
-    - Keeps footprint low.
-    - Ready for real Yandex API calls (Webmaster/Metrica/Direct Wordstat proxies).
+    SEO analyzer:
+    - Работает через выбранный data-provider.
+    - По умолчанию mock (легко и быстро).
+    - Для прода: SEO_DATA_PROVIDER=yandex_hybrid + реальные API вызовы в providers.py.
     """
 
+    def __init__(self) -> None:
+        self.provider = build_provider()
+
     async def analyze(self, lead: SeoLead) -> SeoReport:
-        # In production replace this block with real calls:
-        # webmaster = await self._fetch_webmaster_issues(lead.site_url)
-        # demand = await self._fetch_search_demand(lead.site_url)
-        # competitors = await self._fetch_competitors_snapshot(lead.site_url)
-        website_hash = int(md5(lead.site_url.encode("utf-8")).hexdigest(), 16)
-        demand_score = 35 + website_hash % 66
+        data = await self.provider.collect(lead.site_url)
 
         report_id = str(uuid.uuid4())
         created_at = datetime.now(tz=timezone.utc)
         expires_at = created_at + timedelta(hours=settings.report_ttl_hours)
-
-        critical_errors = [
-            "Нет явного Title/Description на части страниц",
-            "Медленная загрузка мобильной версии",
-            "Не настроены расширенные сниппеты (schema.org)",
-        ]
-
-        competitors = [
-            {"domain": "competitor-a.ru", "gap": "Больше посадочных страниц под коммерческие запросы"},
-            {"domain": "competitor-b.ru", "gap": "Выше видимость по инфозапросам"},
-            {"domain": "competitor-c.ru", "gap": "Сильнее ссылочный профиль"},
-        ]
-
-        recommendations = [
-            "Собрать и кластеризовать семантику по коммерческим и информационным интентам",
-            "Оптимизировать ключевые страницы под E-E-A-T и коммерческие факторы",
-            "Ускорить Core Web Vitals и внедрить технический мониторинг",
-            "Сделать контент-план и усилить внутреннюю перелинковку",
-        ]
 
         summary = (
             "Покажем за 30 минут, почему сайт не приносит заявки. "
@@ -53,10 +33,10 @@ class SeoAnalyzer:
             report_id=report_id,
             site_url=lead.site_url,
             summary=summary,
-            critical_errors=critical_errors,
-            demand_score=demand_score,
-            competitors=competitors,
-            recommendations=recommendations,
+            critical_errors=data.critical_errors,
+            demand_score=data.demand_score,
+            competitors=data.competitors,
+            recommendations=data.recommendations,
             created_at=created_at,
             expires_at=expires_at,
         )
