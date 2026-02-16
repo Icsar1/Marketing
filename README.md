@@ -79,18 +79,25 @@ TOPVISOR_API_KEY=
 
 Если сервер «не знает git», сначала установи его:
 
+Одна строка = одна команда. Не склеивай несколько команд в одну строку.
+
 ```bash
 sudo apt update
 sudo apt install -y git
 ```
 
-Дальше один раз клонируешь проект:
+Дальше один раз клонируешь проект.
+
+⚠️ ВАЖНО: `<your-user>` и `<your-repo>` — это шаблон. Вставь реальный URL репозитория.
+Для этого проекта пример такой:
 
 ```bash
 cd /opt
-sudo git clone https://github.com/<your-user>/<your-repo>.git seo-analyzer
+sudo git clone https://github.com/Icsar1/Marketing.git seo-analyzer
 cd seo-analyzer
 ```
+
+Если репозиторий приватный — используй URL своего приватного репо и авторизацию (token/SSH).
 
 После этого для обновлений не нужно скачивать ZIP. Достаточно:
 
