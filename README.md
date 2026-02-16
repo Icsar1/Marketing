@@ -74,6 +74,39 @@ YANDEX_METRICA_TOKEN=
 TOPVISOR_API_KEY=
 ```
 
+
+## Как забрать проект на VPS через GitHub (без постоянных скачиваний)
+
+Если сервер «не знает git», сначала установи его:
+
+```bash
+sudo apt update
+sudo apt install -y git
+```
+
+Дальше один раз клонируешь проект:
+
+```bash
+cd /opt
+sudo git clone https://github.com/<your-user>/<your-repo>.git seo-analyzer
+cd seo-analyzer
+```
+
+После этого для обновлений не нужно скачивать ZIP. Достаточно:
+
+```bash
+cd /opt/seo-analyzer
+git pull
+```
+
+Если работаешь не из `main`, а из ветки (например `work`), переключись на неё:
+
+```bash
+git fetch --all
+git checkout work
+git pull origin work
+```
+
 ## API
 
 - `GET /health` — проверка, что сервис жив.
