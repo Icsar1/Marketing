@@ -69,8 +69,27 @@ class YandexHybridProvider(BaseSeoDataProvider):
         return await MockSeoDataProvider().collect(site_url)
 
 
+class RussianSeoProvider(BaseSeoDataProvider):
+    """
+    Российский вариант интеграции:
+    - Yandex Webmaster + Yandex Metrica для данных по вашему сайту.
+    - Topvisor API (или аналогичный RU-сервис) для видимости/конкурентов/позиции.
+
+    Реальные вызовы добавляются в TODO-блоке, пока используется fallback на mock.
+    """
+
+    async def collect(self, site_url: str) -> ProviderResult:
+        # TODO: примерный контур прод-интеграции:
+        # webmaster_issues = await self._fetch_webmaster(site_url)
+        # metrica_signals = await self._fetch_metrica(site_url)
+        # topvisor_competitors = await self._fetch_topvisor_visibility(site_url)
+        return await MockSeoDataProvider().collect(site_url)
+
+
 def build_provider() -> BaseSeoDataProvider:
     provider_name = settings.seo_data_provider.lower().strip()
     if provider_name == "yandex_hybrid":
         return YandexHybridProvider()
+    if provider_name == "russian_seo":
+        return RussianSeoProvider()
     return MockSeoDataProvider()

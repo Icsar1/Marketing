@@ -18,16 +18,17 @@
 - `Yandex Metrica API` — поведенка и конверсионные сигналы;
 - внешний SEO/serp-источник для сравнения с конкурентами и keyword gaps.
 
-## Какой внешний SEO API выбрать
+## Российская альтернатива DataForSEO
 
-Практичный вариант для старта:
-- **DataForSEO** — мощный, много SEO-эндпойнтов, удобно масштабировать.
-- Альтернатива: **SerpApi** (если важен быстрый старт по SERP), **SE Ranking API** (если уже используете их стек).
+Если нужна именно российская альтернатива, практичный вариант:
+- **Topvisor API** — российский сервис, который удобно использовать для позиций/видимости/сравнения с конкурентами.
 
-Если цель — минимальный вес и быстрый запуск на VPS, начните так:
-1. Webmaster + Metrica для "своего" сайта;
-2. 1 внешний SEO API только для конкурентов/видимости;
-3. PDF не генерировать на старте (страница `/r/<uuid>` легче и дешевле).
+Рабочая связка для РФ-рынка:
+1. `Yandex Webmaster API` + `Yandex Metrica API`;
+2. `Topvisor API` для конкурентной SEO-видимости и позиций;
+3. при необходимости `Yandex Direct API` как доп. источник по коммерческому спросу.
+
+> В проекте для этого добавлен режим `SEO_DATA_PROVIDER=russian_seo` (каркас интеграции).
 
 ## Что обещаем на лендинге
 
@@ -61,12 +62,13 @@ APP_BASE_URL=https://your-domain.ru
 REPORT_TTL_HOURS=72
 DB_PATH=seo_reports.db
 
-# mock | yandex_hybrid
+# mock | yandex_hybrid | russian_seo
 SEO_DATA_PROVIDER=mock
 
 YANDEX_WEBMASTER_TOKEN=
 YANDEX_DIRECT_TOKEN=
 YANDEX_METRICA_TOKEN=
+TOPVISOR_API_KEY=
 ```
 
 ## Интеграция с Tilda
@@ -100,7 +102,8 @@ JSON:
 
 В `app/providers.py`:
 - `MockSeoDataProvider` — локальная заглушка;
-- `YandexHybridProvider` — контур реального варианта (Webmaster + Metrica + Direct + внешний SEO API).
+- `YandexHybridProvider` — контур варианта (Webmaster + Metrica + Direct + внешний SEO API);
+- `RussianSeoProvider` — контур для РФ-стека (Webmaster + Metrica + Topvisor API).
 
 Выбор провайдера делается через `SEO_DATA_PROVIDER`.
 
