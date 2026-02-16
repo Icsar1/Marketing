@@ -114,6 +114,33 @@ git checkout work
 git pull origin work
 ```
 
+
+## Частая ошибка: `{"detail":"Method Not Allowed"}`
+
+Это не критичная ошибка сервера. Обычно значит, что в `/lead/seo` ушёл **GET**, а endpoint ждёт только **POST**.
+
+Проверь так (одной строкой, без переносов):
+
+```bash
+curl -X POST "http://<VPS_IP>:8000/lead/seo" -H "Content-Type: application/json" -d '{"name":"Иван","phone":"+79990000000","email":"mail@example.com","site_url":"https://example.com"}'
+```
+
+Если в логе снова `GET /lead/seo 405`, значит команда `curl` была вставлена с ошибкой/переносом и shell отправил не тот запрос.
+
+## Нужно ли сначала создавать webhook в Tilda?
+
+Да. Сначала подними и проверь API на VPS, потом в Tilda создай webhook:
+
+- Webhook URL: `http://<VPS_IP>:8000/lead/seo`
+- Method: `POST`
+- API NAME / API KEY: пока можно оставить пустыми
+
+Мини-порядок:
+1. Запустить `uvicorn` на VPS.
+2. Проверить `GET /health`.
+3. Проверить `POST /lead/seo` через `curl`.
+4. Только после этого подключать форму Tilda к этому URL.
+
 ## API
 
 - `GET /health` — проверка, что сервис жив.
