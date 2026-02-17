@@ -143,6 +143,12 @@ curl -X POST "http://<VPS_IP>:8000/lead/seo" -H "Content-Type: application/json"
 4. Только после этого подключать форму Tilda к этому URL.
 
 
+### Ошибка при добавлении webhook в Tilda: `input:"test=test"`
+
+Это тестовый пинг от Tilda при сохранении интеграции. Теперь endpoint принимает его и отвечает `Webhook test received`.
+
+Если после сохранения интеграции тест прошёл, но реальные лиды не приходят — проверь названия полей формы (`name`, `phone`, `email`, `site_url` или их типовые аналоги ниже).
+
 ### Форматы данных от Tilda
 
 Endpoint `/lead/seo` принимает как JSON, так и form-data/urlencoded.

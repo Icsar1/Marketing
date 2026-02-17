@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import parse_qs
 from typing import Any, Dict, Optional
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -46,8 +47,17 @@ async def _extract_request_payload(request: Request) -> Dict[str, Any]:
             data = None
 
     if data is None:
-        form_data = await request.form()
-        data = dict(form_data)
+        try:
+            form_data = await request.form()
+            data = dict(form_data)
+        except Exception:
+            data = None
+
+    if data is None:
+        raw_body = (await request.body()).decode("utf-8", errors="ignore")
+        parsed = parse_qs(raw_body, keep_blank_values=False)
+        if parsed:
+            data = {k: v[0] for k, v in parsed.items() if v}
 
     if not isinstance(data, dict):
         raise HTTPException(
@@ -60,6 +70,7 @@ async def _extract_request_payload(request: Request) -> Dict[str, Any]:
         "phone": _pick_first(data, ["phone", "Phone", "tel", "phone_number"]),
         "email": _pick_first(data, ["email", "Email", "mail"]),
         "site_url": _pick_first(data, ["site_url", "site", "website", "url", "siteUrl"]),
+        "test": _pick_first(data, ["test"]),
     }
 
 
@@ -87,13 +98,16 @@ def health() -> dict:
 
 
 @app.post("/lead/seo")
-async def create_seo_report(request: Request, payload: Optional[LeadPayload] = None):
-    if payload is None:
-        raw_payload = await _extract_request_payload(request)
-        try:
-            payload = LeadPayload(**raw_payload)
-        except ValidationError as exc:
-            raise HTTPException(status_code=422, detail=exc.errors())
+async def create_seo_report(request: Request):
+    raw_payload = await _extract_request_payload(request)
+
+    if raw_payload.get("test") and not any(raw_payload.get(k) for k in ("name", "phone", "email", "site_url")):
+        return JSONResponse({"message": "Webhook test received"})
+
+    try:
+        payload = LeadPayload(**raw_payload)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors())
 
     lead = SeoLead(
         name=payload.name,
