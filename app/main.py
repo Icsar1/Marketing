@@ -66,10 +66,10 @@ async def _extract_request_payload(request: Request) -> Dict[str, Any]:
         )
 
     return {
-        "name": _pick_first(data, ["name", "Name", "fullname", "full_name"]),
-        "phone": _pick_first(data, ["phone", "Phone", "tel", "phone_number"]),
-        "email": _pick_first(data, ["email", "Email", "mail"]),
-        "site_url": _pick_first(data, ["site_url", "site", "website", "url", "siteUrl"]),
+        "name": _pick_first(data, ["name", "Name", "fullname", "full_name", "your-name"]),
+        "phone": _pick_first(data, ["phone", "Phone", "tel", "phone_number", "your-phone"]),
+        "email": _pick_first(data, ["email", "Email", "mail", "your-email"]),
+        "site_url": _pick_first(data, ["site_url", "site", "website", "url", "Url", "siteUrl", "Website"]),
         "test": _pick_first(data, ["test"]),
     }
 
