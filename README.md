@@ -74,6 +74,7 @@ YANDEX_METRICA_TOKEN=
 TOPVISOR_API_KEY=
 ```
 
+codex/-seo-ad4u4v
 
 ## Как забрать проект на VPS через GitHub (без постоянных скачиваний)
 
@@ -165,11 +166,14 @@ Endpoint `/lead/seo` принимает как JSON, так и form-data/urlenco
 - `email` / `Email` / `mail`
 - `site_url` / `site` / `website` / `url`
 
+=======
+main
 ## API
 
 - `GET /health` — проверка, что сервис жив.
 - `POST /lead/seo` — создать SEO-отчет.
 - `GET /r/{report_id}` — страница отчета.
+codex/-seo-ad4u4v
 
 ## Если при запуске ошибка `TypeError: 'type' object is not subscriptable`
 
@@ -243,3 +247,5 @@ grep -nF "list[" app/models.py app/providers.py
 ```bash
 rg -n "list\\[" app/models.py app/providers.py
 ```
+=======
+main

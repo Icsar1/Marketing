@@ -1,16 +1,25 @@
 from dataclasses import dataclass
 from hashlib import md5
+codex/-seo-ad4u4v
 from typing import Dict, List
+=======
+main
 
 from app.config import settings
 
 
 @dataclass
 class ProviderResult:
+codex/-seo-ad4u4v
     critical_errors: List[str]
     demand_score: int
     competitors: List[Dict[str, str]]
     recommendations: List[str]
+    critical_errors: list[str]
+    demand_score: int
+    competitors: list[dict]
+    recommendations: list[str]
+main
 
 
 class BaseSeoDataProvider:

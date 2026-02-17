@@ -1,13 +1,20 @@
 from datetime import datetime, timezone
 from pathlib import Path
+codex/-seo-ad4u4v
 from urllib.parse import parse_qs
 from typing import Any, Dict, Optional
+=======
+ main
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
+codex/-seo-ad4u4v
 from pydantic import BaseModel, HttpUrl, ValidationError
+=======
+from pydantic import BaseModel, HttpUrl
+main
 
 from app.config import settings
 from app.models import SeoLead
@@ -28,6 +35,7 @@ class LeadPayload(BaseModel):
     site_url: HttpUrl
 
 
+codex/-seo-ad4u4v
 def _pick_first(payload: Dict[str, Any], keys: list) -> Optional[str]:
     for key in keys:
         value = payload.get(key)
@@ -74,6 +82,8 @@ async def _extract_request_payload(request: Request) -> Dict[str, Any]:
     }
 
 
+=======
+main
 @app.on_event("startup")
 def startup() -> None:
     scheduler.add_job(
@@ -98,6 +108,7 @@ def health() -> dict:
 
 
 @app.post("/lead/seo")
+ codex/-seo-ad4u4v
 async def create_seo_report(request: Request):
     raw_payload = await _extract_request_payload(request)
 
@@ -109,6 +120,9 @@ async def create_seo_report(request: Request):
     except ValidationError as exc:
         raise HTTPException(status_code=422, detail=exc.errors())
 
+=======
+async def create_seo_report(payload: LeadPayload):
+main
     lead = SeoLead(
         name=payload.name,
         phone=payload.phone,
