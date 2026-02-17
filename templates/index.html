@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Генератор медиаплана Яндекс Директ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Генератор медиаплана для Яндекс Директа</h1>
+      <p>
+        Введите нишу и параметры кампании — приложение подготовит список ключевых слов,
+        оценит частотность/стоимость и сформирует PDF.
+      </p>
+
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul class="alerts">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+
+      <form method="post" class="card">
+        <label>
+          Описание ниши
+          <textarea name="niche" placeholder="Например: монтаж натяжных потолков в Москве" required></textarea>
+        </label>
+
+        <div class="grid">
+          <label>
+            Регион
+            <input type="text" name="region" value="Россия" />
+          </label>
+          <label>
+            Бюджет в месяц (₽)
+            <input type="number" name="budget" min="0" step="1000" value="100000" />
+          </label>
+          <label>
+            Цель кампании
+            <input type="text" name="objective" value="Лиды" />
+          </label>
+        </div>
+
+        <button type="submit">Сформировать PDF медиаплан</button>
+      </form>
+
+      <small>
+        Важно: прямой доступ к данным Wordstat/прогнозатора Direct может требовать авторизацию и
+        ограничен политиками Яндекса. Приложение использует доступные публичные данные и
+        оценочную модель как fallback.
+      </small>
+    </main>
+  </body>
+</html>
