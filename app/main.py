@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, ValidationError
 
 from app.config import settings
 from app.models import SeoLead
@@ -24,6 +25,42 @@ class LeadPayload(BaseModel):
     phone: str
     email: str
     site_url: HttpUrl
+
+
+def _pick_first(payload: Dict[str, Any], keys: list) -> Optional[str]:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+async def _extract_request_payload(request: Request) -> Dict[str, Any]:
+    content_type = request.headers.get("content-type", "").lower()
+    data: Any = None
+
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+        except Exception:
+            data = None
+
+    if data is None:
+        form_data = await request.form()
+        data = dict(form_data)
+
+    if not isinstance(data, dict):
+        raise HTTPException(
+            status_code=422,
+            detail="Body должен быть JSON-объектом или form-data.",
+        )
+
+    return {
+        "name": _pick_first(data, ["name", "Name", "fullname", "full_name"]),
+        "phone": _pick_first(data, ["phone", "Phone", "tel", "phone_number"]),
+        "email": _pick_first(data, ["email", "Email", "mail"]),
+        "site_url": _pick_first(data, ["site_url", "site", "website", "url", "siteUrl"]),
+    }
 
 
 @app.on_event("startup")
@@ -50,7 +87,14 @@ def health() -> dict:
 
 
 @app.post("/lead/seo")
-async def create_seo_report(payload: LeadPayload):
+async def create_seo_report(request: Request, payload: Optional[LeadPayload] = None):
+    if payload is None:
+        raw_payload = await _extract_request_payload(request)
+        try:
+            payload = LeadPayload(**raw_payload)
+        except ValidationError as exc:
+            raise HTTPException(status_code=422, detail=exc.errors())
+
     lead = SeoLead(
         name=payload.name,
         phone=payload.phone,

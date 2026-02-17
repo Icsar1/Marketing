@@ -133,13 +133,24 @@ curl -X POST "http://<VPS_IP>:8000/lead/seo" -H "Content-Type: application/json"
 
 - Webhook URL: `http://<VPS_IP>:8000/lead/seo`
 - Method: `POST`
-- API NAME / API KEY: пока можно оставить пустыми
+- API NAME / API KEY: можно оставить пустыми (Timeweb API key здесь не нужен)
+- Если хочешь передавать ключ из Tilda: API NAME=`token`, API KEY=`<секрет>`, и потом проверять `token` на backend
 
 Мини-порядок:
 1. Запустить `uvicorn` на VPS.
 2. Проверить `GET /health`.
 3. Проверить `POST /lead/seo` через `curl`.
 4. Только после этого подключать форму Tilda к этому URL.
+
+
+### Форматы данных от Tilda
+
+Endpoint `/lead/seo` принимает как JSON, так и form-data/urlencoded.
+Поддерживаются типичные имена полей из конструкторов форм:
+- `name` / `Name` / `fullname`
+- `phone` / `Phone` / `tel`
+- `email` / `Email` / `mail`
+- `site_url` / `site` / `website` / `url`
 
 ## API
 
