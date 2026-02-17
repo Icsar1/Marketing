@@ -1,11 +1,20 @@
 from datetime import datetime, timezone
 from pathlib import Path
+codex/-seo-ad4u4v
+from urllib.parse import parse_qs
+from typing import Any, Dict, Optional
+=======
+ main
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
+codex/-seo-ad4u4v
+from pydantic import BaseModel, HttpUrl, ValidationError
+=======
 from pydantic import BaseModel, HttpUrl
+main
 
 from app.config import settings
 from app.models import SeoLead
@@ -26,6 +35,55 @@ class LeadPayload(BaseModel):
     site_url: HttpUrl
 
 
+codex/-seo-ad4u4v
+def _pick_first(payload: Dict[str, Any], keys: list) -> Optional[str]:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+async def _extract_request_payload(request: Request) -> Dict[str, Any]:
+    content_type = request.headers.get("content-type", "").lower()
+    data: Any = None
+
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+        except Exception:
+            data = None
+
+    if data is None:
+        try:
+            form_data = await request.form()
+            data = dict(form_data)
+        except Exception:
+            data = None
+
+    if data is None:
+        raw_body = (await request.body()).decode("utf-8", errors="ignore")
+        parsed = parse_qs(raw_body, keep_blank_values=False)
+        if parsed:
+            data = {k: v[0] for k, v in parsed.items() if v}
+
+    if not isinstance(data, dict):
+        raise HTTPException(
+            status_code=422,
+            detail="Body должен быть JSON-объектом или form-data.",
+        )
+
+    return {
+        "name": _pick_first(data, ["name", "Name", "fullname", "full_name", "your-name"]),
+        "phone": _pick_first(data, ["phone", "Phone", "tel", "phone_number", "your-phone"]),
+        "email": _pick_first(data, ["email", "Email", "mail", "your-email"]),
+        "site_url": _pick_first(data, ["site_url", "site", "website", "url", "Url", "siteUrl", "Website"]),
+        "test": _pick_first(data, ["test"]),
+    }
+
+
+=======
+main
 @app.on_event("startup")
 def startup() -> None:
     scheduler.add_job(
@@ -50,7 +108,21 @@ def health() -> dict:
 
 
 @app.post("/lead/seo")
+ codex/-seo-ad4u4v
+async def create_seo_report(request: Request):
+    raw_payload = await _extract_request_payload(request)
+
+    if raw_payload.get("test") and not any(raw_payload.get(k) for k in ("name", "phone", "email", "site_url")):
+        return JSONResponse({"message": "Webhook test received"})
+
+    try:
+        payload = LeadPayload(**raw_payload)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors())
+
+=======
 async def create_seo_report(payload: LeadPayload):
+main
     lead = SeoLead(
         name=payload.name,
         phone=payload.phone,
